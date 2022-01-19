@@ -28,6 +28,7 @@ def load_image_json(file_path: str) -> Tuple[list, list]:
 
 
 # ?是不是应该提供一种从文件夹导入图片的方法
+# ?name, encoding, comment
 def crawling_image(name: str, image_url: str, comment: str = '', path: str = 'images'):
     # TODO: 现在只实现了保存下载图片，还得把数据存到csv里去
 
