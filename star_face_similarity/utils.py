@@ -1,3 +1,4 @@
+import os
 import csv
 import base64
 from typing import List, Tuple
@@ -60,9 +61,28 @@ def load_data_csv(file_path):
 
 def crawling_image(name: str, image_url: str, path: str = 'images'):
     res = requests.get(image_url)
+    if not os.path.exists(path):
+        os.makedirs(os.path.abspath(path))
     extension = image_url.rsplit('.')[-1]
     with open(f'{path}/{name}.{extension}', 'wb') as f:
         f.write(res.content)
+
+    return os.path.abspath(f'{path}/{name}.{extension}')
+
+
+def find_all_file(path: str):
+    file_list = []
+    files = os.listdir(path)
+
+    for file in files:
+        file_path = os.path.join(path, file)
+        if os.path.isdir(file_path):
+            inner_file_list = find_all_file(file_path)
+            file_list = file_list + inner_file_list
+        elif os.path.isfile(file_path):
+            file_list.append(file_path)
+
+    return file_list
 
 
 def save_image_json(face_names: list, face_encoding: List[np.ndarray], file_path: str):
