@@ -1,3 +1,9 @@
+# Customize
+/.vscode
+/temp
+/app/processing_data.ipynb
+haarcascade*.xml
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
