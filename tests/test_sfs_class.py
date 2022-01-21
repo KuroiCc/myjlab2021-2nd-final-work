@@ -29,18 +29,24 @@ class TestSFS(unittest.TestCase):
 
     def test_get_best_match_from_file(self):
         t = self.sfs.get_best_match_from_file('./temp/images/sei.jpg')
-        self.assertEqual(t[0], '井浦新')
+        self.assertEqual(self.sfs.model_data[t[0]].name, '神木隆之介')
 
     def test_get_best_match_from_bytes(self):
         url = 'https://img.ranking.net/uploads/item/image/66/80/b6/default_2000030327.jpg'
         res = requests.get(url)
         t = self.sfs.get_best_match_from_bytes(res.content)
-        self.assertEqual(t[0], '新垣結衣')
+        self.assertEqual(self.sfs.model_data[t[0]].name, '新垣結衣')
 
-    def test_find_face(self):
+    def test_find_one_face_cv2(self):
         img = cv2.imread('./temp/images/sei.jpg')
         img = img[:, :, ::-1]
-        res = self.sfs.find_face(img)
+        res = self.sfs.find_one_face_cv2(img)
+        self.assertTrue(res)
+
+    def test_find_one_face(self):
+        img = cv2.imread('./temp/images/sei.jpg')
+        img = img[:, :, ::-1]
+        res = self.sfs.find_one_face(img)
         self.assertTrue(res)
 
 
