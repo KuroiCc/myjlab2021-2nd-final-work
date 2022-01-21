@@ -5,7 +5,7 @@ import numpy as np
 from PIL import Image
 import face_recognition
 
-from star_face_similarity.utils import load_data_csv
+from star_face_similarity.utils import load_data_csv, rotateImage
 
 
 class StarFaceSimilarity:
@@ -18,7 +18,18 @@ class StarFaceSimilarity:
 
     def _transform_bytes_image_to_RGB_ndarray(self, bytes):
         image = Image.open(io.BytesIO(bytes))
-        image.convert('RGB')
+
+        try:
+            # exif情報取得
+            exifinfo = image._getexif()
+            # exif情報からOrientationの取得
+            orientation = exifinfo.get(0x112, 1)
+            # 画像を回転
+            image = rotateImage(image, orientation)
+
+        except Exception as e:
+            print(e)
+
         image = np.array(image)
         return image
 

@@ -6,6 +6,7 @@ from typing import List, Tuple
 import json
 import requests
 import numpy as np
+from PIL import Image
 from pydantic import BaseModel
 
 
@@ -83,6 +84,44 @@ def find_all_file(path: str):
             file_list.append(file_path)
 
     return file_list
+
+
+def rotateImage(img: Image.Image, orientation):
+    """
+    The source of this code is as follows. Some changes have been made compared to the source.
+    source:https://max999blog.com/python-rotate-image-by-exif-orientation/
+
+    画像ファイルをOrientationの値に応じて回転させる
+    """
+    img_rotate = img
+    # orientationの値に応じて画像を回転させる
+    if orientation == 1:
+        pass
+    elif orientation == 2:
+        # 左右反転
+        img_rotate = img.transpose(Image.FLIP_LEFT_RIGHT)
+    elif orientation == 3:
+        # 180度回転
+        img_rotate = img.transpose(Image.ROTATE_180)
+    elif orientation == 4:
+        # 上下反転
+        img_rotate = img.transpose(Image.FLIP_TOP_BOTTOM)
+    elif orientation == 5:
+        # 左右反転して90度回転
+        img_rotate = img.transpose(Image.FLIP_LEFT_RIGHT).transpose(Image.ROTATE_90)
+    elif orientation == 6:
+        # 270度回転
+        img_rotate = img.transpose(Image.ROTATE_270)
+    elif orientation == 7:
+        # 左右反転して270度回転
+        img_rotate = img.transpose(Image.FLIP_LEFT_RIGHT).transpose(Image.ROTATE_270)
+    elif orientation == 8:
+        # 90度回転
+        img_rotate = img.transpose(Image.ROTATE_90)
+    else:
+        pass
+
+    return img_rotate
 
 
 def save_image_json(face_names: list, face_encoding: List[np.ndarray], file_path: str):
