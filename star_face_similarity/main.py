@@ -1,4 +1,5 @@
 import io
+from typing import Tuple, Optional
 
 import cv2
 import numpy as np
@@ -16,7 +17,7 @@ class StarFaceSimilarity:
 
         self.faceCascade = cv2.CascadeClassifier(faceCascade_path)
 
-    def _transform_bytes_image_to_RGB_ndarray(self, bytes):
+    def get_rgb_ndarray_img_from_bytes(self, bytes):
         image = Image.open(io.BytesIO(bytes))
 
         try:
@@ -26,51 +27,27 @@ class StarFaceSimilarity:
             orientation = exifinfo.get(0x112, 1)
             # 画像を回転
             image = rotateImage(image, orientation)
-
         except Exception as e:
             print(e)
 
-        image = np.array(image)
-        return image
+        return np.array(image)
 
-    def get_best_match_from_file(self, file_path: str):
-        """
-        ファイルから最も似てる顔を返す
-        返すデータは
-        name, similarity, src_url, comment
-        """
-        image = face_recognition.load_image_file(file_path)
-        return self.get_best_match_from_RGB_ndarray(image)
+    def find_one_face(self, rgb_ndarray_img: np.ndarray):
+        face_locations = face_recognition.face_locations(rgb_ndarray_img)
 
-    def get_best_match_from_bytes(self, bytes):
-        image = self._transform_bytes_image_to_RGB_ndarray(bytes)
-        return self.get_best_match_from_RGB_ndarray(image)
+        if not face_locations:
+            return None
 
-    def get_best_match_from_RGB_ndarray(self, RGB_ndarray: np.ndarray):
-        face_location = self.find_face(RGB_ndarray)
-        if face_location is None:
-            return
-        face_encoding = face_recognition.face_encodings(RGB_ndarray, [face_location])
+        # find the largest one
+        area_list = [(r - l) * (b - t) for t, r, b, l in face_locations]
 
-        if face_encoding:
-            face_encoding = face_encoding[0]
-            face_distances = face_recognition.face_distance(self.model, face_encoding)
+        return face_locations[area_list.index(max(area_list))]
 
-            best_match_index = np.argmin(face_distances)
-            res = self.model_data[best_match_index]
-            return (
-                res.name,
-                1 - face_distances[best_match_index],
-                res.src_url,
-                res.comment,
-            )
-
-    def find_face(self, RGB_ndarray: np.ndarray):
-        gray = cv2.cvtColor(RGB_ndarray[:, :, ::-1], cv2.COLOR_BGR2GRAY)
-        print(RGB_ndarray.shape)
+    def find_one_face_cv2(self, rgb_ndarray_img: np.ndarray):
+        gray = cv2.cvtColor(rgb_ndarray_img[:, :, ::-1], cv2.COLOR_BGR2GRAY)
         faces = self.faceCascade.detectMultiScale(
             gray,
-            scaleFactor=1.3,
+            scaleFactor=1.2,
             minNeighbors=3,
             minSize=(20, 20),
         )
@@ -85,3 +62,41 @@ class StarFaceSimilarity:
         x, y, w, h = faces[area_list.index(max(area_list))]
         # return faces
         return y, x + w, y + h, x
+
+    def get_best_match(
+        self,
+        rgb_ndarray_img: np.ndarray,
+        face_location: Optional[Tuple[float, float, float, float]] = None,
+    ):
+        if face_location is None:
+            face_location = self.find_one_face(rgb_ndarray_img)
+
+        if face_location is None:
+            return None
+
+        face_encoding = \
+            face_recognition.face_encodings(rgb_ndarray_img, [face_location])[0]
+
+        face_distances = face_recognition.face_distance(self.model, face_encoding)
+        best_match_index = np.argmin(face_distances)
+
+        return best_match_index, 1 - face_distances[best_match_index]
+
+    def get_best_match_from_file(
+        self,
+        file_path: str,
+        face_location: Optional[Tuple[float, float, float, float]] = None,
+    ):
+        """
+        ファイルから最も似てる顔を返す
+        """
+        image = face_recognition.load_image_file(file_path)
+        return self.get_best_match(image, face_location)
+
+    def get_best_match_from_bytes(
+        self,
+        bytes,
+        face_location: Optional[Tuple[float, float, float, float]] = None,
+    ):
+        image = self.get_rgb_ndarray_img_from_bytes(bytes)
+        return self.get_best_match(image, face_location)
