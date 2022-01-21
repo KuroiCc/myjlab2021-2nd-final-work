@@ -104,11 +104,11 @@ class StarFaceSimilarity:
     def surround_face(
         self,
         rgb_ndarray_img: np.ndarray,
-        face_location: Optional[Tuple[float, float, float, float]],
+        face_location: Tuple[float, float, float, float],
         thickness=3,
     ):
         top, right, bottom, left = face_location
-        rgb_ndarray_img = rgb_ndarray_img[:, :, ::-1]
-        cv2.rectangle(rgb_ndarray_img, (left, top), (right, bottom), (0, 0, 255), thickness)
+        bgr_img = cv2.cvtColor(rgb_ndarray_img, cv2.COLOR_RGB2BGR)
+        cv2.rectangle(bgr_img, (left, top), (right, bottom), (0, 0, 255), thickness)
 
-        return rgb_ndarray_img[:, :, ::-1]
+        return bgr_img[:, :, ::-1]

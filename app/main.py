@@ -1,3 +1,4 @@
+from PIL import Image
 from pywebio import start_server
 from pywebio.input import file_upload
 from pywebio.output import put_markdown, use_scope, put_image, put_html, put_column, put_row
@@ -15,23 +16,28 @@ def main():
         ''')
 
     img = file_upload("Select a image:", accept="image/*", required=True)
-    res = sfs.get_best_match_from_bytes(img['content'])
-    if res is None:
+    nd_img = sfs.get_rgb_ndarray_img_from_bytes(img['content'])
+    face_location = sfs.find_one_face(nd_img)
+    if face_location is None:
         put_markdown('# 顔を検出できませんでした。')
-    else:
-        name, similarity, src_url, comment = res
-        with use_scope('res', clear=True):
-            put_markdown(f'# {name}との類似度は：{round(similarity*100,2)}%')
-            put_row(
-                content=[
-                    put_image(img['content'], width='200px'),
-                    put_column([
-                        put_image(src_url, width='200px'),
-                        put_html(comment),
-                    ])
-                ]
-            )
+        return
+
+    index, similarity = sfs.get_best_match(nd_img, face_location)
+    surrounded_img = Image.fromarray(sfs.surround_face(nd_img, face_location))
+    with use_scope('res', clear=True):
+        put_markdown(f'# {sfs.model_data[index].name}との類似度は：{round(similarity*100,2)}%')
+        put_row(
+            content=[
+                put_image(surrounded_img, width='200px'),
+                put_column(
+                    [
+                        put_image(sfs.model_data[index].src_url, width='200px'),
+                        put_html(sfs.model_data[index].comment),
+                    ]
+                )
+            ]
+        )
 
 
 if __name__ == '__main__':
-    start_server(main, port=39001, debug=True)
+    start_server(main, port=39001)
