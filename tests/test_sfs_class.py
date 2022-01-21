@@ -4,6 +4,7 @@ from datetime import datetime
 
 import cv2
 import requests
+import numpy as np
 
 from star_face_similarity import StarFaceSimilarity
 
@@ -48,6 +49,15 @@ class TestSFS(unittest.TestCase):
         img = img[:, :, ::-1]
         res = self.sfs.find_one_face(img)
         self.assertTrue(res)
+
+    def test_surround_face(self):
+        img = cv2.imread('./temp/images/sei.jpg')
+        img2 = cv2.imread('./temp/images/surround_face.png')
+        img = img[:, :, ::-1]
+        face_location = self.sfs.find_one_face(img)
+        img = self.sfs.surround_face(img, face_location, 3)
+        # cv2.imwrite('./tests/surround_face.png', img[:, :, ::-1])
+        self.assertTrue(np.array_equal(img, img2[:, :, ::-1]))
 
 
 if __name__ == "__main__":
