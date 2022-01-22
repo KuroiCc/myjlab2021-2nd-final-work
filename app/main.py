@@ -1,3 +1,5 @@
+import os
+
 from PIL import Image
 from pywebio import start_server
 from pywebio.input import file_upload
@@ -40,4 +42,4 @@ def main():
 
 
 if __name__ == '__main__':
-    start_server(main, port=39001)
+    start_server(main, port=os.getenv('APP_PORT'))
