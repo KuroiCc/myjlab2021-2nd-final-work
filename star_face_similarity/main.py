@@ -18,13 +18,16 @@ class StarFaceSimilarity:
         self.faceCascade = cv2.CascadeClassifier(faceCascade_path)
 
     def get_rgb_ndarray_img_from_bytes(self, bytes):
+        print('get_bytes')
         image = Image.open(io.BytesIO(bytes))
 
         try:
             # exif情報取得
             exifinfo = image._getexif()
+            print('get exif info')
             # exif情報からOrientationの取得
             orientation = exifinfo.get(0x112, 1)
+            print('get orientation')
             # 画像を回転
             image = rotateImage(image, orientation)
         except Exception as e:
