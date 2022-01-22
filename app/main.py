@@ -25,8 +25,8 @@ def main():
 
         put_image(loading, width='300px')
 
-    print('start processing...')
     nd_img = sfs.get_rgb_ndarray_img_from_bytes(img['content'])
+    print('start processing...')
     face_location = sfs.find_one_face(nd_img)
     if face_location is None:
         put_markdown('# 顔を検出できませんでした。')
