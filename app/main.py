@@ -25,6 +25,7 @@ def main():
 
         put_image(loading, width='300px')
 
+    print('start processing...')
     nd_img = sfs.get_rgb_ndarray_img_from_bytes(img['content'])
     face_location = sfs.find_one_face(nd_img)
     if face_location is None:
@@ -49,4 +50,4 @@ def main():
 
 
 if __name__ == '__main__':
-    start_server(main, port=39001, static_dir='./app/public')
+    start_server(main, port=os.getenv('APP_PORT'), static_dir='./app/public')
