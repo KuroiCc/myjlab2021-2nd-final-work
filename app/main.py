@@ -19,6 +19,13 @@ def main():
 
     img = file_upload("Select a image:", accept="image/*", required=True)
     nd_img = sfs.get_rgb_ndarray_img_from_bytes(img['content'])
+
+    with use_scope('res', clear=True):
+        with open('./app/public/loading.gif', 'rb') as f:
+            loading = f.read()
+
+        put_image(loading, width='300px')
+
     face_location = sfs.find_one_face(nd_img)
     if face_location is None:
         put_markdown('# 顔を検出できませんでした。')
@@ -42,4 +49,4 @@ def main():
 
 
 if __name__ == '__main__':
-    start_server(main, port=os.getenv('APP_PORT'))
+    start_server(main, port=39001, static_dir='./app/public')
