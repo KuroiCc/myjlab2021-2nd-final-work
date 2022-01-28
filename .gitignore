@@ -2,6 +2,7 @@
 /.vscode
 /temp
 /app/processing_data.ipynb
+/app/logs
 haarcascade*.xml
 
 # Byte-compiled / optimized / DLL files
