@@ -1,10 +1,10 @@
 import os
 import logging
-from datetime import datetime
+# from datetime import datetime
 
 from PIL import Image
-# from pywebio import start_server
-from pywebio.platform.tornado_http import start_server
+from pywebio import start_server
+# from pywebio.platform.tornado_http import start_server
 from pywebio.input import file_upload
 from pywebio.output import put_markdown, use_scope, put_image, put_html, put_column, put_row
 from pywebio.session import info
@@ -14,8 +14,8 @@ from star_face_similarity import StarFaceSimilarity
 
 def main():
     logger = logging.getLogger('main_app')
-    model_data_path = './app/data.csv'
-    faceCascade_path = './app/haarcascade_frontalface_default.xml'
+    model_data_path = '/home/chencheng/git-repositorys/myjlab2021-2nd-final-work/app/data.csv'
+    faceCascade_path = '/home/chencheng/git-repositorys/myjlab2021-2nd-final-work/app/haarcascade_frontalface_default.xml'
     sfs = StarFaceSimilarity(model_data_path, faceCascade_path)
 
     put_markdown('# 有名人と顔の類似度\nどの有名人と一番似ているかを比較します。')
@@ -23,7 +23,7 @@ def main():
     img = file_upload("Select a image:", accept="image/*", required=True)
     print(f'Accept pictures: {img["filename"]}')
     with use_scope('res', clear=True):
-        with open('./app/public/loading.gif', 'rb') as f:
+        with open('/home/chencheng/git-repositorys/myjlab2021-2nd-final-work/app/public/loading.gif', 'rb') as f:
             loading = f.read()
 
         put_image(loading, width='300px')
@@ -54,22 +54,25 @@ def main():
         )
 
 
-if __name__ == '__main__':
+def run():
     log_path = os.path.abspath(f'{__file__}/../logs')
     if not os.path.exists(log_path):
         os.mkdir(log_path)
     logging.basicConfig(
         level=logging.INFO,
-        filename=f'{log_path}/{datetime.now().strftime("%Y%m%d_%H%M%S")}.log',
+        filename=f'{log_path}/log.log',
         format='%(asctime)s - %(filename)s[line:%(lineno)d] - %(levelname)s: %(message)s'
     )
 
     start_server(
         main,
-        port=os.getenv('APP_PORT'),
+        port=os.getenv('STAR_FACE_SIMILARITY_PORT'),
         static_dir='./app/public',
         allowed_origins=['*'],
         # session_expire_seconds=600,
         # session_cleanup_interval=120,
         # max_payload_size='400M'
     )
+
+if __name__ == '__main__':
+    run()
