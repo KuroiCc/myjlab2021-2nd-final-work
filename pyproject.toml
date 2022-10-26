@@ -1,0 +1,32 @@
+[tool.poetry]
+name = "star-face-similarity"
+version = "0.1.0"
+description = ""
+authors = ["Kuroi_Cc <chenchengmikuro@gmail.com>"]
+license = "MIT"
+readme = "README.md"
+packages = [{include = "star_face_similarity"}]
+
+[tool.poetry.scripts]
+start = "app:run"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+opencv-python = "^4.5.5.62"
+numpy = "^1.20.1"
+pillow = "^8.1.0"
+face-recognition = "^1.3.0"
+pydantic = "^1.9.0"
+requests = "^2.27.1"
+pywebio = "^1.5.2"
+python-dotenv = "^0.21.0"
+
+
+[tool.poetry.group.dev.dependencies]
+yapf = "^0.32.0"
+flake8 = "^5.0.4"
+toml = "^0.10.2"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
